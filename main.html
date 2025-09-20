@@ -4,20 +4,20 @@
         <meta charset="utf-8">
         <title>Password Manager Popup</title>
         <link rel="stylesheet" href="style.css">
-        <link rel="javascript" href="password.js">
+        <script src="password.js"></script>
     </head>
     <body>
-        <h1>Welcome to Your Pasword Manager</h1>
+    <h1>Welcome to Your Password Manager</h1>
         <div id="password-list">
             <h3>Here are your saved passwords.</h3>
         </div>
         <div id="new-password">
             <h3>Enter a new password</h3>
-            <form action="action.php">
+            <form method="post" id="new-pswd-form">
                 <label for="pLabel">Password Label:</label>
                 <input type="text" id="pLabel" name="pLabel"><br><br>
                 <label for="password">Password:</label>
-                <input type="text" id="password" name="password"><br><br>
+                <input type="password" id="password" name="password"><br><br>
                 <input type="submit" value="Submit">
             </form>
         </div>
