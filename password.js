@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
             let listItem = event.target.closest('li');
             listItem = listItem.innerHTML.split(':')[0]; // Keep only the label part
             listItem += '<button class="show-button">Show</button><button class="delete-button">Delete</button>';
-            listItem.remove();
         }
     });
     savedPasswordsList.addEventListener('click', function(event) {
