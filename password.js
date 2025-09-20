@@ -36,9 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
             listItem.remove();
         }
         if (event.target.classList.contains('hide-button')) {
-            let listItem = event.target.closest('li');
-            listItem = listItem.innerHTML.split(':')[0]; // Keep only the label part
-            listItem += '<button class="show-button">Show</button><button class="delete-button">Delete</button>';
+            const listItem = event.target.closest('li');
+            const label = listItem.textContent.split(':')[0].trim();
+            listItem.innerHTML = `${label} <button class="show-button">Show</button><button class="delete-button">Delete</button>`;
         }
     });
     savedPasswordsList.addEventListener('click', function(event) {
