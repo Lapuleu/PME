@@ -35,6 +35,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const listItem = event.target.closest('li');
             listItem.remove();
         }
+        if (event.target.classList.contains('hide-button')) {
+            let listItem = event.target.closest('li');
+            listItem = listItem.innerHTML.split(':')[0]; // Keep only the label part
+            listItem += '<button class="show-button">Show</button><button class="delete-button">Delete</button>';
+            listItem.remove();
+        }
     });
     savedPasswordsList.addEventListener('click', function(event) {
         if (event.target.classList.contains('show-button')) {
@@ -51,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 { type: 'wolfram-decrypt', encrypted: entry.encrypted, key: entry.key },
                 response => {
                     if (response && response.decrypted) {
-                        listItem.innerHTML = `${label}: ${response.decrypted} <button class="delete-button">Delete</button>`;
+                        listItem.innerHTML = `${label}: ${response.decrypted} <button class="hide-button">Hide</button><button class="delete-button">Delete</button>`;
                         console.log(label + ': ' + response.decrypted);
                     } else {
                         console.error('Decryption error:', response && response.error);
