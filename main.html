@@ -8,8 +8,18 @@
     </head>
     <body>
         <h1>Welcome to Your Pasword Manager</h1>
-        <div>
+        <div id="password-list">
             <h3>Here are your saved passwords.</h3>
+        </div>
+        <div id="new-password">
+            <h3>Enter a new password</h3>
+            <form action="action.php">
+                <label for="pLabel">Password Label:</label>
+                <input type="text" id="pLabel" name="pLabel"><br><br>
+                <label for="password">Password:</label>
+                <input type="text" id="password" name="password"><br><br>
+                <input type="submit" value="Submit">
+            </form>
         </div>
     </body>
 </html>
