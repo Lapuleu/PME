@@ -6,6 +6,12 @@ function generateRandomKey(length = 32) {
 document.addEventListener('DOMContentLoaded', function() {
     const myForm = document.getElementById('new-pswd-form');
     const savedPasswordsList = document.getElementById('saved-passwords');
+    chrome.storage.local.get(['passwords'], result => {
+        let saved = result.passwords || {};
+        for (const label in saved) {
+            savedPasswordsList.innerHTML += `<li data-label="${label}">${label} <button class="show-button">Show</button><button class="delete-button">Delete</button></li>`;
+        }
+    });
     myForm.addEventListener('submit', function(event) {
         event.preventDefault();
         const formData = new FormData(myForm);
