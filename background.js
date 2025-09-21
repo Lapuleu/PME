@@ -1,37 +1,29 @@
-// Replace these with your actual CloudDeploy endpoints
-const ENCRYPT_URL = "https://www.wolframcloud.com/obj/silversharkan/aesEncrypt";
-const DECRYPT_URL = "https://www.wolframcloud.com/obj/silversharkan/aesDecrypt";
+// background.js for Chrome Extension
+// Handles API requests to Wolfram Cloud to bypass CORS
 
-async function callWolfram(endpoint, payload) {
-  const resp = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-      // Optionally add an API key header here:
-      // "X-API-Key": "<your-secret-token>"
-    },
-    body: JSON.stringify(payload)
-  });
-
-  if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-  return await resp.text(); // Wolfram returns plain text
-}
-
-// Listen for messages from popup/content scripts
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === "wolfram-encrypt") {
-    const { input, key } = request;
-    callWolfram(ENCRYPT_URL, { key, input })
-      .then(encrypted => sendResponse({ encrypted }))
-      .catch(error   => sendResponse({ error: error.message }));
-    return true; // keep sendResponse async
-  }
-
-  if (request.type === "wolfram-decrypt") {
-    const { input, key } = request;
-    callWolfram(DECRYPT_URL, { key, input })
-      .then(decrypted => sendResponse({ decrypted }))
-      .catch(error   => sendResponse({ error: error.message }));
-    return true;
-  }
+chrome.runtime.onMessage.addListener((request, sendResponse) => {
+    if (request.type === 'wolfram-encrypt') {
+        const { input, key } = request;
+        fetch('https://www.wolframcloud.com/obj/silversharkan/aesencrypt?key=' + encodeURIComponent(key) + '&input=' + encodeURIComponent(input))
+            .then(response => response.text())
+            .then(encrypted => {
+                sendResponse({ encrypted });
+            })
+            .catch(error => {
+                sendResponse({ error: error.message });
+            });
+        return true; // Indicates async response
+    }
+    if (request.type === 'wolfram-decrypt') {
+        const { input, key } = request;
+        fetch('https://www.wolframcloud.com/obj/silversharkan/aesdecrypt?key=' + encodeURIComponent(key) + '&input=' + encodeURIComponent(input))
+            .then(response => response.text())
+            .then(decrypted => {
+                sendResponse({ decrypted });
+            })
+            .catch(error => {
+                sendResponse({ error: error.message });
+            });
+        return true;
+    }
 });
