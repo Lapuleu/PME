@@ -61,7 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
                          <button class="show-button">Show</button>
                          <button class="delete-button">Delete</button>
                        </li>`;
-                    console.log('Encrypted:', JSON.stringify(re));
+                    console.log('Encrypted:', JSON.stringify(re).replace(/(\r\n|\n|\r)/gm, ""));
+                    re = JSON.stringify(re).replace(/(\r\n|\n|\r)/gm, "");
                     chrome.storage.local.get(['passwords'], result => {
                         const saved = result.passwords || {};
                         saved[newPlabel] = { encrypted: re, key: key };
