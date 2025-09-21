@@ -6,7 +6,7 @@ import {
   Transaction,
   TransactionInstruction,
   sendAndConfirmTransaction,
-} from "/@solana/web3.js";
+} from "/node_modules/@solana/web3.js";
 
 /**
  * Key-Value Store client using a custom Solana program.
