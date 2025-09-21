@@ -3,8 +3,8 @@
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === 'wolfram-encrypt') {
-        const { password, key } = request;
-        fetch('https://www.wolframcloud.com/obj/silversharkan/aesencrypt?input=' + encodeURIComponent(password) + '&key=' + encodeURIComponent(key))
+        const { input, key } = request;
+        fetch('https://www.wolframcloud.com/obj/silversharkan/aesencrypt?key=' + encodeURIComponent(key) + '&input=' + encodeURIComponent(input))
             .then(response => response.text())
             .then(encrypted => {
                 sendResponse({ encrypted });
@@ -15,8 +15,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return true; // Indicates async response
     }
     if (request.type === 'wolfram-decrypt') {
-        const { encrypted, key } = request;
-        fetch('https://www.wolframcloud.com/obj/silversharkan/aesdecrypt?input=' + encodeURIComponent(encrypted) + '&key=' + encodeURIComponent(key))
+        const { input, key } = request;
+        fetch('https://www.wolframcloud.com/obj/silversharkan/aesdecrypt?key=' + encodeURIComponent(key) + '&input=' + encodeURIComponent(input))
             .then(response => response.text())
             .then(decrypted => {
                 sendResponse({ decrypted });
