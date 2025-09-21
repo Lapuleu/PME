@@ -1,10 +1,11 @@
+import { storeKeyValue, getKeyValue } from "./solana";
+
 function generateRandomKey(length = 32) {
     const array = new Uint8Array(length);
     window.crypto.getRandomValues(array);
     return Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
 }
 
-import { storeKeyValue, getKeyValue } from "./solana";
 document.addEventListener('DOMContentLoaded', () => {
     const myForm = document.getElementById('new-pswd-form');
     const savedPasswordsList = document.getElementById('saved-passwords');
