@@ -35,7 +35,17 @@ document.addEventListener('DOMContentLoaded', () => {
             response => {
                 if (response?.encrypted) {
                     let re = response.encrypted;
-                    re = re.replace(/\s+/g, "");
+
+                    // Step 1: Parse the JSON string to get the actual value
+                    try {
+                        re = JSON.parse(re);
+                    } catch (e) {
+                        // If it's not valid JSON, just use the original string
+                    }
+                    re = re.replace(/\\+/g, '');      // Remove all backslashes
+                    re = re.replace(/\\n|\\r|\\t/g, ''); // Remove escaped newlines, returns, tabs
+                    re = re.replace(/\\\"/g, '"');    // Optionally, unescape quotes
+
                     console.log('Cleaned Encrypted:', re);
                     savedPasswordsList.innerHTML +=
                       `<li data-label="${newPlabel}">
