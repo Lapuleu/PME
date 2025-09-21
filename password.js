@@ -40,11 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
                          <button class="show-button">Show</button>
                          <button class="delete-button">Delete</button>
                        </li>`;
-                       response.encrypted.replace("\n", "");
-                    console.log('Encrypted:', response.encrypted.replace("\n", ""));
+                       response.encrypted.replace(/\n/g, '');
+                    console.log('Encrypted:', response.encrypted.replace(/\n/g, ''));
                     chrome.storage.local.get(['passwords'], result => {
                         const saved = result.passwords || {};
-                        saved[newPlabel] = { encrypted: response.encrypted.replace("\n", ""), key };
+                        saved[newPlabel] = { encrypted: response.encrypted.replace(/\n/g, ''), key };
                         chrome.storage.local.set({ passwords: saved });
                     });
                 } else {
