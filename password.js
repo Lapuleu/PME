@@ -17,12 +17,15 @@ document.addEventListener('DOMContentLoaded', function() {
             { type: 'wolfram-encrypt', password: newPassword, key: key },
             response => {
                 if (response && response.encrypted) {
-                    savedPasswordsList.innerHTML += `<li>${newPlabel} <button class="show-button">Show</button><button class="delete-button">Delete</button></li>`;
-                    // Save to localStorage (or chrome.storage) for demo; you can adapt to your needs
-                    let saved = JSON.parse(localStorage.getItem('passwords') || '{}');
-                    saved[newPlabel] = { encrypted: response.encrypted, key: key };
-                    localStorage.setItem('passwords', JSON.stringify(saved));
-                    console.log(newPlabel + ": " + response.encrypted);
+                    savedPasswordsList.innerHTML += `<li data-label="${newPlabel}">${newPlabel} <button class="show-button">Show</button><button class="delete-button">Delete</button></li>`;
+                    // Save to chrome.storage.local
+                    chrome.storage.local.get(['passwords'], result => {
+                        let saved = result.passwords || {};
+                        saved[newPlabel] = { encrypted: response.encrypted, key: key };
+                        chrome.storage.local.set({ passwords: saved }, () => {
+                            console.log(newPlabel + ": " + response.encrypted);
+                        });
+                    });
                 } else {
                     console.error('Encryption error:', response && response.error);
                 }
@@ -33,36 +36,47 @@ document.addEventListener('DOMContentLoaded', function() {
     savedPasswordsList.addEventListener('click', function(event) {
         if (event.target.classList.contains('delete-button')) {
             const listItem = event.target.closest('li');
-            listItem.remove();
+            const label = listItem.getAttribute('data-label');
+            // Remove from chrome.storage.local
+            chrome.storage.local.get(['passwords'], result => {
+                let saved = result.passwords || {};
+                delete saved[label];
+                chrome.storage.local.set({ passwords: saved }, () => {
+                    listItem.remove();
+                });
+            });
         }
         if (event.target.classList.contains('hide-button')) {
             const listItem = event.target.closest('li');
-            const label = listItem.textContent.split(':')[0].trim();
+            const label = listItem.getAttribute('data-label');
             listItem.innerHTML = `${label} <button class="show-button">Show</button><button class="delete-button">Delete</button>`;
         }
     });
     savedPasswordsList.addEventListener('click', function(event) {
         if (event.target.classList.contains('show-button')) {
             const listItem = event.target.closest('li');
-            const label = listItem.textContent.replace('ShowDelete', '').trim();
-            // Retrieve encrypted and key from localStorage (or chrome.storage)
-            let saved = JSON.parse(localStorage.getItem('passwords') || '{}');
-            const entry = saved[label];
-            if (!entry) {
-                console.error('Label not found');
-                return;
-            }
-            chrome.runtime.sendMessage(
-                { type: 'wolfram-decrypt', encrypted: entry.encrypted, key: entry.key },
-                response => {
-                    if (response && response.decrypted) {
-                        listItem.innerHTML = `${label}: ${response.decrypted} <button class="hide-button">Hide</button><button class="delete-button">Delete</button>`;
-                        console.log(label + ': ' + response.decrypted);
-                    } else {
-                        console.error('Decryption error:', response && response.error);
-                    }
+            const label = listItem.getAttribute('data-label');
+            // Retrieve encrypted and key from chrome.storage.local
+            chrome.storage.local.get(['passwords'], result => {
+                let saved = result.passwords || {};
+                const entry = saved[label];
+                if (!entry) {
+                    console.error('Label not found');
+                    return;
                 }
-            );
+                chrome.runtime.sendMessage(
+                    { type: 'wolfram-decrypt', encrypted: entry.encrypted, key: entry.key },
+                    response => {
+                        if (response && response.decrypted) {
+                            listItem.innerHTML = `${label}: ${response.decrypted} <button class="hide-button">Hide</button><button class="delete-button">Delete</button>`;
+                            listItem.setAttribute('data-label', label);
+                            console.log(label + ': ' + response.decrypted);
+                        } else {
+                            console.error('Decryption error:', response && response.error);
+                        }
+                    }
+                );
+            });
         }
     });
 });
