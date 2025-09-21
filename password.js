@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     re = re.replace(/\\n|\\r|\\t/g, ''); // Remove escaped newlines, returns, tabs
                     re = re.replace(/\\+/g, '');      // Remove all backslashes
                     re = re.replace(/\\\"/g, '"');    // Optionally, unescape quotes
+                    re = re.replace(/\\n|\\r|\\t/g, ''); // Remove escaped newlines, returns, tabs
 
                     console.log('Cleaned Encrypted:', re);
                     savedPasswordsList.innerHTML +=
