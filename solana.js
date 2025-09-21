@@ -1,5 +1,5 @@
-import * as anchor from "@project-serum/anchor"
-import { PublicKey } from "@solana/web3.js"
+import * as anchor from "/node_modules/@project-serum/anchor"
+import { PublicKey } from "/node_modules/@solana/web3.js"
 
 // Anchor setup
 const provider = anchor.AnchorProvider.local()
