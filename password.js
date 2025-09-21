@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const key = generateRandomKey(32);
         // Use Chrome extension background script for AES encryption
         chrome.runtime.sendMessage(
-            { type: 'wolfram-encrypt', password: newPassword, key: key },
+            { type: 'wolfram-encrypt', input: newPassword, key: key },
             response => {
                 if (response && response.encrypted) {
                     savedPasswordsList.innerHTML += `<li data-label="${newPlabel}">${newPlabel} <button class="show-button">Show</button><button class="delete-button">Delete</button></li>`;
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Encrypted value:', entry.encrypted);
                 console.log('Key:', entry.key);
                 chrome.runtime.sendMessage(
-                    { type: 'wolfram-decrypt', encrypted: entry.encrypted, key: entry.key },
+                    { type: 'wolfram-decrypt', input: entry.encrypted, key: entry.key },
                     response => {
                         if (response && response.decrypted) {
                             listItem.innerHTML = `${label}: ${response.decrypted} <button class="hide-button">Hide</button><button class="delete-button">Delete</button>`;
