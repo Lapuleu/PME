@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData   = new FormData(myForm);
         const newPlabel  = formData.get("pLabel");
         let newPassword= formData.get("password");
-        let key        = generateRandomKey(32);
+        let key = generateRandomKey(32);
         if (!newPlabel || !newPassword) return alert('Label and Password are required');
 
         // Check for duplicate labels
@@ -48,9 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     } catch (e) {
                         // If it's not valid JSON, just use the original string
                     }
-                    re = re.replace(/\\+/g, '');      // Remove all backslashes
                     re = re.replace(/\\n|\\r|\\t/g, ''); // Remove escaped newlines, returns, tabs
                     re = re.replace(/\\\"/g, '"');    // Optionally, unescape quotes
+                    re = re.replace(/\\+/g, '');      // Remove all backslashes
+                    re = re.replace(/^"+|"+$/g, ''); // Remove leading/trailing quotes if present
 
                     console.log('Cleaned Encrypted:', re);
                     savedPasswordsList.innerHTML +=
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log('Encrypted:', re);
                     chrome.storage.local.get(['passwords'], result => {
                         const saved = result.passwords || {};
-                        saved[newPlabel] = { encrypted: re, key };
+                        saved[newPlabel] = { encrypted: re, k: key };
                         chrome.storage.local.set({ passwords: saved });
                     });
                 } else {
@@ -72,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         );
         myForm.reset();
         newPassword = null;
-        key = null;
     });
 
     // Delete or Hide password
@@ -107,11 +107,13 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.storage.local.get(['passwords'], result => {
             const entry = (result.passwords || {})[label];
             if (!entry) return console.error('Label not found');
+            console.log('Entry:', entry);  
 
             chrome.runtime.sendMessage(
-                { type: 'wolfram-decrypt', input: entry.encrypted, key: entry.key },
+                { type: 'wolfram-decrypt', input: entry.encrypted, key: entry.k },
                 response => {
                     if (response?.decrypted) {
+                        console.log('Decrypt response:', response);
                         listItem.innerHTML =
                           `${label}: ${response.decrypted}
                            <button class="hide-button">Hide</button>
