@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Save to chrome.storage.local
                     chrome.storage.local.get(['passwords'], result => {
                         let saved = result.passwords || {};
+                        console.log('encrypted value:', response.encrypted);
                         saved[newPlabel] = { encrypted: response.encrypted, key: key };
                         chrome.storage.local.set({ passwords: saved }, () => {
                             console.log(newPlabel + ": " + response.encrypted);
