@@ -1,5 +1,4 @@
-import { storeKeyValue, getKeyValue } from "./solana";
-
+import { generateWallet, storeKeyValue, getKeyValue } from "./solana.js";
 function generateRandomKey(length = 32) {
     const array = new Uint8Array(length);
     window.crypto.getRandomValues(array);
@@ -7,9 +6,14 @@ function generateRandomKey(length = 32) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const wallet = generateWallet();
     const myForm = document.getElementById('new-pswd-form');
-    const savedPasswordsList = document.getElementById('saved-passwords');
-
+    (async() => {
+        const savedPasswordsList = document.getElementById('saved-passwords');
+        const { Connection, LAMPORTS_PER_SOL } = await import("@solana/web3.js");
+        const conn = new Connection("https://api.devnet.solana.com");
+        await conn.requestAirdrop(wallet.publicKey, 1 * LAMPORTS_PER_SOL);
+    });
     // Load saved passwords on startup
     chrome.storage.local.get(['passwords'], result => {
         const saved = result.passwords || {};
@@ -68,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         chrome.storage.local.set({ passwords: saved });
                     });
                     // Store in Solana blockchain
-                    storeKeyValue(newPlabel, key).then(() => {
+                    storeKeyValue(wallet, newPlabel, key).then(() => {
                         console.log('Stored on Solana:', newPlabel);
                     }).catch(err => {
                         console.error('Solana storage error:', err);

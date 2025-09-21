@@ -1,62 +1,85 @@
-import * as anchor from "/node_modules/@project-serum/anchor"
-import { PublicKey } from "/node_modules/@solana/web3.js"
+import {
+  Connection,
+  PublicKey,
+  Keypair,
+  SystemProgram,
+  Transaction,
+  TransactionInstruction,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
 
-// Anchor setup
-const provider = anchor.AnchorProvider.local()
-anchor.setProvider(provider)
+/**
+ * Key-Value Store client using a custom Solana program.
+ * Your program must accept two instructions:
+ *   - "store" to save a key/value
+ *   - "get" (account fetch) to read the data
+ *
+ * This client assumes a simple program where each key maps to a PDA
+ * derived from ["kv", key].
+ */
 
-const programId = new PublicKey("AwArBUWBbQZp5uwPikx3rMxQkjFAYZBnM1R9w66AqDZJ")
-const program = new anchor.Program(
-  require("../target/idl/kv_store_multi.json"),
-  programId,
-  provider
-)
+const RPC_URL = "https://api.devnet.solana.com"; // or mainnet
+const connection = new Connection(RPC_URL, "confirmed");
 
-// Store a key-value pair
-export async function storeKeyValue(key, value) {
-  const [pda] = await PublicKey.findProgramAddress(
-    [Buffer.from("kv_multi")],
-    program.programId
-  )
+// ----------------------
+// CONFIGURATION
+// ----------------------
+// Replace with your deployed program’s public key
+const PROGRAM_ID = new PublicKey("AwArBUWBbQZp5uwPikx3rMxQkjFAYZBnM1R9w66AqDZJ");
 
-  await program.methods
-    .storePair(Buffer.from(key), Buffer.from(value))
-    .accounts({
-      kvAccount: pda,
-      user: provider.wallet.publicKey,
-      systemProgram: anchor.web3.SystemProgram.programId
-    })
-    .rpc()
-
-  return pda.toBase58()
+/**
+ * Generate or load a wallet.
+ * For production use, integrate Phantom or another wallet adapter.
+ */
+export function generateWallet() {
+  return Keypair.generate();
 }
 
-// Retrieve a single key-value
+/**
+ * Store a key-value pair on Solana.
+ * @param {Keypair} wallet - Keypair paying for the transaction.
+ * @param {string} key - Arbitrary string key.
+ * @param {string} value - Arbitrary string value.
+ * @returns {string} - PDA where the value is stored.
+ */
+export async function storeKeyValue(wallet, key, value) {
+  const [pda] = await PublicKey.findProgramAddress(
+    [Buffer.from("kv"), Buffer.from(key)],
+    PROGRAM_ID
+  );
+
+  const instruction = new TransactionInstruction({
+    keys: [
+      { pubkey: pda, isSigner: false, isWritable: true },
+      { pubkey: wallet.publicKey, isSigner: true, isWritable: false },
+      { pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
+    ],
+    programId: PROGRAM_ID,
+    data: Buffer.from(JSON.stringify({ action: "store", key, value })),
+  });
+
+  const tx = new Transaction().add(instruction);
+
+  await sendAndConfirmTransaction(connection, tx, [wallet]);
+  return pda.toBase58();
+}
+
+/**
+ * Retrieve a stored value.
+ * @param {string} key
+ * @returns {string} value stored (program must return raw data)
+ */
 export async function getKeyValue(key) {
   const [pda] = await PublicKey.findProgramAddress(
-    [Buffer.from("kv_multi")],
-    program.programId
-  )
+    [Buffer.from("kv"), Buffer.from(key)],
+    PROGRAM_ID
+  );
 
-  const account = await program.account.kvAccount.fetch(pda)
-  const index = account.keys.findIndex(k => Buffer.from(k).toString() === key)
-  if (index === -1) return null
-  return Buffer.from(account.values[index]).toString()
-}
+  // Fetch raw account data from the Solana cluster
+  const accountInfo = await connection.getAccountInfo(pda);
+  if (!accountInfo) throw new Error("Key not found on-chain");
 
-// Retrieve all key-values
-export async function getAllKeyValues() {
-  const [pda] = await PublicKey.findProgramAddress(
-    [Buffer.from("kv_multi")],
-    program.programId
-  )
-
-  const account = await program.account.kvAccount.fetch(pda)
-  const result = {}
-  for (let i = 0; i < account.keys.length; i++) {
-    result[Buffer.from(account.keys[i]).toString()] = Buffer.from(
-      account.values[i]
-    ).toString()
-  }
-  return result
+  // Decode according to your program’s data layout
+  // This example assumes raw UTF-8 string
+  return Buffer.from(accountInfo.data).toString();
 }
