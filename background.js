@@ -1,7 +1,7 @@
 // background.js for Chrome Extension
 // Handles API requests to Wolfram Cloud to bypass CORS
 
-chrome.runtime.onMessage.addListener((request, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === 'wolfram-encrypt') {
         const { input, key } = request;
         fetch('https://www.wolframcloud.com/obj/silversharkan/aesencrypt?key=' + encodeURIComponent(key) + '&input=' + encodeURIComponent(input))
