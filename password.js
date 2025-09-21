@@ -1,3 +1,5 @@
+import { storeKeyValue, getKeyValue } from "./solana";
+
 function generateRandomKey(length = 32) {
     const array = new Uint8Array(length);
     window.crypto.getRandomValues(array);
@@ -62,8 +64,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log('Encrypted:', JSON.stringify(re));
                     chrome.storage.local.get(['passwords'], result => {
                         const saved = result.passwords || {};
-                        saved[newPlabel] = { encrypted: re, key };
+                        saved[newPlabel] = { encrypted: re };
                         chrome.storage.local.set({ passwords: saved });
+                    });
+                    // Store in Solana blockchain
+                    storeKeyValue(newPlabel, key).then(() => {
+                        console.log('Stored on Solana:', newPlabel);
+                    }).catch(err => {
+                        console.error('Solana storage error:', err);
                     });
                 } else {
                     console.error('Encryption error:', response?.error);
@@ -107,9 +115,15 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.storage.local.get(['passwords'], result => {
             const entry = (result.passwords || {})[label];
             if (!entry) return console.error('Label not found');
+            // Retrieve key from Solana blockchain
+            getKeyValue(label).then(key => {
+                if (!key) {
+                    return console.error('Key not found on Solana for label:', label);
+                }
+            });
 
             chrome.runtime.sendMessage(
-                { type: 'wolfram-decrypt', input: entry.encrypted, key: entry.key },
+                { type: 'wolfram-decrypt', input: entry.encrypted, key: key },
                 response => {
                     if (response?.decrypted) {
                         listItem.innerHTML =
