@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         re = JSON.parse(re);
                     } catch (e) {
                         // If it's not valid JSON, just use the original string
+                        console.log('JSON parse error, using original string');
                     }
                     re = re.replace(/\\n|\\r|\\t/g, ''); // Remove escaped newlines, returns, tabs
                     re = re.replace(/\\+/g, '');      // Remove all backslashes
