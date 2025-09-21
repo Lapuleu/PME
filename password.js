@@ -41,10 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
                          <button class="delete-button">Delete</button>
                        </li>`;
                        response.encrypted.replace(/(\r\n|\n|\r)/g, "");
-                    console.log('Encrypted:', response.encrypted);
+                    console.log('Encrypted:', response.encrypted.replace(/(\r\n|\n|\r)/g, ""));
                     chrome.storage.local.get(['passwords'], result => {
                         const saved = result.passwords || {};
-                        saved[newPlabel] = { encrypted: response.encrypted, key };
+                        saved[newPlabel] = { encrypted: response.encrypted.replace(/(\r\n|\n|\r)/g, ""), key };
                         chrome.storage.local.set({ passwords: saved });
                     });
                 } else {
