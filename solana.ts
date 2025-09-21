@@ -1,22 +1,28 @@
 import * as anchor from "@project-serum/anchor";
 import { PublicKey } from "@solana/web3.js";
 
-// Initialize Anchor program
+// Anchor setup
 const provider = anchor.AnchorProvider.local();
 anchor.setProvider(provider);
 
 const programId = new PublicKey("AwArBUWBbQZp5uwPikx3rMxQkjFAYZBnM1R9w66AqDZJ");
 const program = new anchor.Program(
-  require("../target/idl/kv_store.json"),
+  require("../target/idl/kv_store_multi.json"),
   programId,
   provider
 );
 
+// Type-safe interface
+interface KVAccount {
+  keys: Uint8Array[];
+  values: Uint8Array[];
+}
+
 // Store a key-value pair
-export async function storeKeyValue(key: string, value: string) {
+export async function storeKeyValue(key: string, value: string): Promise<string> {
   const [pda] = await PublicKey.findProgramAddress(
-    [Buffer.from("kv"), Buffer.from(key)],
-    programId
+    [Buffer.from("kv_multi")],
+    program.programId
   );
 
   await program.methods
@@ -31,23 +37,30 @@ export async function storeKeyValue(key: string, value: string) {
   return pda.toBase58();
 }
 
-// Retrieve a key-value pair
-export async function getKeyValue(key: string) {
-  const [pda] = await PublicKey.findProgramAddressSync(
-    [Buffer.from("kv"), Buffer.from(key)],
-    programId
+// Retrieve a single key-value
+export async function getKeyValue(key: string): Promise<string | null> {
+  const [pda] = await PublicKey.findProgramAddress(
+    [Buffer.from("kv_multi")],
+    program.programId
   );
 
-  const account = await program.account.kvAccount.fetch(pda) as {
-    key: Uint8Array,
-    value: Uint8Array
-  };
+  const account = (await program.account.kvAccount.fetch(pda)) as KVAccount;
+  const index = account.keys.findIndex(k => Buffer.from(k).toString() === key);
+  if (index === -1) return null;
+  return Buffer.from(account.values[index]).toString();
+}
 
-  console.log("Key:", Buffer.from(account.key).toString());
-  console.log("Value:", Buffer.from(account.value).toString());
+// Retrieve all key-values
+export async function getAllKeyValues(): Promise<Record<string, string>> {
+  const [pda] = await PublicKey.findProgramAddress(
+    [Buffer.from("kv_multi")],
+    program.programId
+  );
 
-  return {
-    key: Buffer.from(account.key).toString(),
-    value: Buffer.from(account.value).toString()
-  };
+  const account = (await program.account.kvAccount.fetch(pda)) as KVAccount;
+  const result: Record<string, string> = {};
+  for (let i = 0; i < account.keys.length; i++) {
+    result[Buffer.from(account.keys[i]).toString()] = Buffer.from(account.values[i]).toString();
+  }
+  return result;
 }

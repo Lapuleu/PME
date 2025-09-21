@@ -3,22 +3,27 @@ use anchor_lang::prelude::*;
 declare_id!("AwArBUWBbQZp5uwPikx3rMxQkjFAYZBnM1R9w66AqDZJ");
 
 #[program]
-pub mod kv_store {
+pub mod kv_store_multi {
     use super::*;
 
-    // Store a key-value pair (both are arbitrary bytes)
-    pub fn store_pair(ctx: Context<StorePair>, key: Vec<u8>, value: Vec<u8>) -> Result<()> {
+    pub fn store_pair(ctx: Context<StorePairs>, key: Vec<u8>, value: Vec<u8>) -> Result<()> {
         let kv_account = &mut ctx.accounts.kv_account;
-        kv_account.key = key;
-        kv_account.value = value;
+
+        // Replace value if key exists
+        if let Some(pos) = kv_account.keys.iter().position(|k| *k == key) {
+            kv_account.values[pos] = value;
+        } else {
+            kv_account.keys.push(key);
+            kv_account.values.push(value);
+        }
         Ok(())
     }
 }
 
 #[derive(Accounts)]
-pub struct StorePair<'info> {
-    #[account(init_if_needed, payer = user, space = 8 + 64 + 64)]
-    pub kv_account: Account<'info, KVAccount>, // stores up to 64 bytes each
+pub struct StorePairs<'info> {
+    #[account(init_if_needed, payer = user, space = 8 + 1024)]
+    pub kv_account: Account<'info, KVAccount>,
     #[account(mut)]
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
@@ -26,6 +31,6 @@ pub struct StorePair<'info> {
 
 #[account]
 pub struct KVAccount {
-    pub key: Vec<u8>,
-    pub value: Vec<u8>,
+    pub keys: Vec<Vec<u8>>,
+    pub values: Vec<Vec<u8>>,
 }

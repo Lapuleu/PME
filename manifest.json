@@ -12,7 +12,8 @@
   },
   "permissions": [
     "scripting",
-    "storage"
+    "storage",
+    "activeTab"
   ],
   "host_permissions": [
     "https://www.wolframcloud.com/*"
