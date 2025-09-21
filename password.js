@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // Step 1: Parse the JSON string to get the actual value
                     try {
-                        re = JSON.parse(re);
+                        re = JSON.stringify(JSON.parse(re));
                     } catch (e) {
                         // If it's not valid JSON, just use the original string
                     }
