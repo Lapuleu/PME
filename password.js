@@ -34,17 +34,21 @@ document.addEventListener('DOMContentLoaded', () => {
             { type: 'wolfram-encrypt', input: newPassword, key },
             response => {
                 if (response?.encrypted) {
+                    let re = response.encrypted;
+                    re = re.replace(/\n/g, '');
+                    re = re.replace(/\r/g, '');
+                    re = re.replace(/(\r\n|\n|\r)/g, "");
+                    console.log('Cleaned Encrypted:', re);
                     savedPasswordsList.innerHTML +=
                       `<li data-label="${newPlabel}">
                          ${newPlabel}
                          <button class="show-button">Show</button>
                          <button class="delete-button">Delete</button>
                        </li>`;
-                       response.encrypted.replace(/\n/g, '');
-                    console.log('Encrypted:', response.encrypted.replace(/\n/g, ''));
+                    console.log('Encrypted:', re);
                     chrome.storage.local.get(['passwords'], result => {
                         const saved = result.passwords || {};
-                        saved[newPlabel] = { encrypted: response.encrypted.replace(/\n/g, ''), key };
+                        saved[newPlabel] = { encrypted: re, key };
                         chrome.storage.local.set({ passwords: saved });
                     });
                 } else {
