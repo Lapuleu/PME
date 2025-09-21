@@ -1,6 +1,6 @@
 // Replace these with your actual CloudDeploy endpoints
-const ENCRYPT_URL = "https://www.wolframcloud.com/obj/silversharkan/aesencrypt";
-const DECRYPT_URL = "https://www.wolframcloud.com/obj/silversharkan/aesdecrypt";
+const ENCRYPT_URL = "https://www.wolframcloud.com/obj/silversharkan/aesEncrypt";
+const DECRYPT_URL = "https://www.wolframcloud.com/obj/silversharkan/aesDecrypt";
 
 async function callWolfram(endpoint, payload) {
   const resp = await fetch(endpoint, {
