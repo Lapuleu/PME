@@ -35,9 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             response => {
                 if (response?.encrypted) {
                     let re = response.encrypted;
-                    re = re.replace(/\n/g, '');
-                    re = re.replace(/\r/g, '');
-                    re = re.replace(/(\r\n|\n|\r)/g, "");
+                    re = re.replace(/\s+/g, "");
                     console.log('Cleaned Encrypted:', re);
                     savedPasswordsList.innerHTML +=
                       `<li data-label="${newPlabel}">
