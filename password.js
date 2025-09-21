@@ -64,6 +64,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('Label not found');
                     return;
                 }
+                console.log('Decrypting label:', label);
+                console.log('Encrypted value:', entry.encrypted);
+                console.log('Key:', entry.key);
                 chrome.runtime.sendMessage(
                     { type: 'wolfram-decrypt', encrypted: entry.encrypted, key: entry.key },
                     response => {
