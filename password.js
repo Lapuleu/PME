@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
                          <button class="show-button">Show</button>
                          <button class="delete-button">Delete</button>
                        </li>`;
+                       response.encrypted.replace(/(\r\n|\n|\r)/g, "");
                     console.log('Encrypted:', response.encrypted);
                     chrome.storage.local.get(['passwords'], result => {
                         const saved = result.passwords || {};
