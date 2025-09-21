@@ -1,0 +1,52 @@
+Notebook[{Cell[
+CellGroupData[{Cell[
+BoxData[{RowBox[{RowBox[{"sha256Hash","[","input_String","]"}]," ",":="," ",RowBox[
+{"StringDelete","[",RowBox[{RowBox[{"ExportString","[",RowBox[{RowBox[{"Hash","[",RowBox[
+{"input",","," ","\"SHA1\"",","," ","\"HexString\""}],"]"}],","," ","\"Text\""}],"]"}],",",RowBox[
+{"\"\\n\""," ","|"," ","\"\\n\""}]}],"]"}]}],"\n",RowBox[{RowBox[{"CloudDeploy","[","\n","\[NonBreakingSpace] ",RowBox[
+{RowBox[{"APIFunction","[",RowBox[{RowBox[{"{",RowBox[{"\"input\""," ","\[Rule]"," ","\"String\""}],"}"}],","," ",RowBox[
+{RowBox[{"sha1Hash","[","#input","]"}]," ","&"}]}],"]"}],",","\n","\[NonBreakingSpace] ","\"sha1hash\"",",","\n","\[NonBreakingSpace] ",RowBox[
+{"Permissions"," ","\[Rule]"," ","\"Public\""}]}],"\n","]"}],"\n"}]}],"Input",CellFrame -> 1,
+ExpressionUUID -> "9ec9231b-1657-4928-a02a-e23a90154102"],Cell[
+BoxData[InterpretationBox[
+RowBox[{"CloudObject","[",TemplateBox[{"\"https://www.wolframcloud.com/obj/silversharkan/sha256hash\"","https://www.wolframcloud.com/obj/silversharkan/sha256hash"},
+"HyperlinkURL"],"]"}],CloudObject["https://www.wolframcloud.com/obj/silversharkan/sha256hash"],
+SelectWithContents -> True]],"Output",CellLabel -> "Out[2]= ",ExpressionUUID -> "95f1738c-aca1-47b7-8010-0345c7d6f4e9"]},
+Open],ExpressionUUID -> "6ee3530c-09dd-4645-b139-08940a9e4964"],Cell[
+CellGroupData[
+{Cell[
+BoxData[{RowBox[{RowBox[{"aesEncrypt","[",RowBox[{"key_String",","," ","input_String"}],"]"}]," ",":="," ",RowBox[
+{"ExportString","[",RowBox[{RowBox[{"Encrypt","[",RowBox[{"key",","," ","input"}],"]"}],",","\"WL\""}],"]"}]}],RowBox[
+{"\n","\n"}],RowBox[{RowBox[{"aesDecrypt","[",RowBox[{"key_String",","," ","input_String"}],"]"}]," ",":="," ",RowBox[
+{"Decrypt","[",RowBox[{"key",","," ",RowBox[{"ImportString","[",RowBox[{"input",","," ","\"WL\""}],"]"}]}],"]"}]}],"\n",RowBox[
+{"CloudDeploy","[","\n"," ",RowBox[{RowBox[{"APIFunction","[","\n","   ",RowBox[{RowBox[
+{"{",RowBox[{RowBox[{"\"key\""," ","\[Rule]"," ","\"String\""}],","," ",RowBox[{"\"input\""," ","\[Rule]"," ","\"String\""}]}],"}"}],",","\n","   ",RowBox[
+{RowBox[{"aesEncrypt","[",RowBox[{"#key",","," ","#input"}],"]"}]," ","&"}]}],"\n"," ","]"}],",","\n"," ","\"aesencrypt\"",",","\n"," ",RowBox[
+{"Permissions"," ","\[Rule]"," ","\"Public\""}]}],"\n","]"}],"\n",RowBox[{"CloudDeploy","[","\n"," ",RowBox[
+{RowBox[{"APIFunction","[","\n","   ",RowBox[{RowBox[{"{",RowBox[{RowBox[{"\"key\""," ","\[Rule]"," ","\"String\""}],","," ",RowBox[
+{"\"input\""," ","\[Rule]"," ","\"String\""}]}],"}"}],",","\n","   ",RowBox[{RowBox[
+{"aesDecrypt","[",RowBox[{"#key",","," ","#input"}],"]"}]," ","&"}]}],"\n"," ","]"}],",","\n"," ","\"aesdecrypt\"",",","\n"," ",RowBox[
+{"Permissions"," ","\[Rule]"," ","\"Public\""}]}],"\n","]"}]}],"Input",CellFrame -> 1,
+CellLabel -> "In[1]:= ",ExpressionUUID -> "766a8ff6-b5e8-43fd-8328-6a30c77ed781"],Cell[
+BoxData[
+InterpretationBox[RowBox[{"CloudObject","[",TemplateBox[{"\"https://www.wolframcloud.com/obj/silversharkan/aesencrypt\"","https://www.wolframcloud.com/obj/silversharkan/aesencrypt"},
+"HyperlinkURL"],"]"}],CloudObject["https://www.wolframcloud.com/obj/silversharkan/aesencrypt"],
+SelectWithContents -> True],StandardForm],"Output",CellLabel -> "Out[3]= ",ExpressionUUID -> "45eea96d-139d-4f17-b038-e6638bad9973"],Cell[
+BoxData[
+InterpretationBox[RowBox[{"CloudObject","[",TemplateBox[{"\"https://www.wolframcloud.com/obj/silversharkan/aesdecrypt\"","https://www.wolframcloud.com/obj/silversharkan/aesdecrypt"},
+"HyperlinkURL"],"]"}],CloudObject["https://www.wolframcloud.com/obj/silversharkan/aesdecrypt"],
+SelectWithContents -> True],StandardForm],"Output",CellLabel -> "Out[4]= ",ExpressionUUID -> "e55cc9b2-f743-46d3-b85b-f6c65174b6a1"]},
+Open],ExpressionUUID -> "6cb34949-6d24-41f8-b5d6-c7bb932e507e"],Cell[
+CellGroupData[
+{Cell[
+BoxData[{RowBox[{"es"," ","="," ",RowBox[{"ExportString","[",RowBox[{RowBox[
+{"Encrypt","[",RowBox[{"\"1\"",","," ","\"1\""}],"]"}],",","\"WL\""}],"]"}]}],"\n",RowBox[
+{"Decrypt","[",RowBox[{"\"1\"",","," ",RowBox[{"ImportString","[",RowBox[{"es",","," ","\"WL\""}],"]"}]}],"]"}]}],
+"Input",CellLabel -> "In[30]:= ",ExpressionUUID -> "5f12c2c1-5afe-4a0a-80c4-dd91b035fb1b"],Cell[
+BoxData[
+"\"(* Created with the Wolfram Language : www.wolfram.com *)\\nEncryptedObject[<|\\\"Cipher\\\" -> \\\"AES256\\\", \\\"BlockMode\\\" -> \\\"CBC\\\", \\n  \\\"InitializationVector\\\" -> ByteArray[\\\"n9Td59AcTN1SLfbbwKGd1A==\\\"], \\n  \\\"Data\\\" -> ByteArray[\\\"3o6vZxhi4mws3w5wKQWfwA==\\\"], \\\"Padding\\\" -> Automatic, \\n  \\\"OriginalForm\\\" -> String|>]\\n\""],
+"Output",CellLabel -> "Out[30]= ",ExpressionUUID -> "d6cfd51f-87a8-4e61-b788-385365aa755b"],Cell[
+BoxData[
+"\"1\""],"Output",CellLabel -> "Out[31]= ",ExpressionUUID -> "c4e30dbb-30bf-4c14-8d2d-14971872553d"]},
+Open],ExpressionUUID -> "2f8cb5ec-2208-41ee-ac20-57159285456e"]},StyleDefinitions -> "Default.nb",
+FrontEndVersion -> "14.3 for Wolfram Cloud 1.73 (July 23, 2025)"]
