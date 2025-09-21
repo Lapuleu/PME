@@ -42,17 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (response?.encrypted) {
                     let re = response.encrypted;
 
+                    
                     // Step 1: Parse the JSON string to get the actual value
                     try {
                         re = JSON.parse(re);
                     } catch (e) {
                         // If it's not valid JSON, just use the original string
-                        console.log('JSON parse error, using original string');
                     }
-                    re = re.replace(/\\n|\\r|\\t/g, ''); // Remove escaped newlines, returns, tabs
                     re = re.replace(/\\+/g, '');      // Remove all backslashes
-                    re = re.replace(/\\\"/g, '"');    // Optionally, unescape quotes
                     re = re.replace(/\\n|\\r|\\t/g, ''); // Remove escaped newlines, returns, tabs
+                    re = re.replace(/\\\"/g, '"');    // Optionally, unescape quotes
 
                     console.log('Cleaned Encrypted:', re);
                     savedPasswordsList.innerHTML +=
@@ -61,11 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
                          <button class="show-button">Show</button>
                          <button class="delete-button">Delete</button>
                        </li>`;
-                    console.log('Encrypted:', JSON.stringify(re).replace(/(\r\n|\n|\r)/gm, ""));
-                    re = JSON.stringify(re).replace(/(\r\n|\n|\r)/gm, "");
+                    console.log('Encrypted:', JSON.stringify(re));
                     chrome.storage.local.get(['passwords'], result => {
                         const saved = result.passwords || {};
-                        saved[newPlabel] = { encrypted: re, key: key };
+                        saved[newPlabel] = { encrypted: re, key };
                         chrome.storage.local.set({ passwords: saved });
                     });
                 } else {
