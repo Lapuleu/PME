@@ -38,7 +38,14 @@ export async function getKeyValue(key: string) {
     programId
   );
 
-  const account = await program.account.kvAccount.fetch(pda);
+  const account = await program.account.kvAccount.fetch(pda) as {
+    key: Uint8Array,
+    value: Uint8Array
+  };
+
+  console.log("Key:", Buffer.from(account.key).toString());
+  console.log("Value:", Buffer.from(account.value).toString());
+
   return {
     key: Buffer.from(account.key).toString(),
     value: Buffer.from(account.value).toString()
