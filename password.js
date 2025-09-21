@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (response?.encrypted) {
                     let re = response.encrypted;
 
-                    
                     // Step 1: Parse the JSON string to get the actual value
                     try {
                         re = JSON.parse(re);
