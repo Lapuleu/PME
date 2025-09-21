@@ -1,4 +1,3 @@
-import { generateWallet, storeKeyValue, getKeyValue } from "./solana.js";
 function generateRandomKey(length = 32) {
     const array = new Uint8Array(length);
     window.crypto.getRandomValues(array);
@@ -6,14 +5,9 @@ function generateRandomKey(length = 32) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const wallet = generateWallet();
     const myForm = document.getElementById('new-pswd-form');
-    (async() => {
-        const savedPasswordsList = document.getElementById('saved-passwords');
-        const { Connection, LAMPORTS_PER_SOL } = await import("@solana/web3.js");
-        const conn = new Connection("https://api.devnet.solana.com");
-        await conn.requestAirdrop(wallet.publicKey, 1 * LAMPORTS_PER_SOL);
-    });
+    const savedPasswordsList = document.getElementById('saved-passwords');
+
     // Load saved passwords on startup
     chrome.storage.local.get(['passwords'], result => {
         const saved = result.passwords || {};
@@ -68,14 +62,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.log('Encrypted:', JSON.stringify(re));
                     chrome.storage.local.get(['passwords'], result => {
                         const saved = result.passwords || {};
-                        saved[newPlabel] = { encrypted: re };
+                        saved[newPlabel] = { encrypted: re , key};
                         chrome.storage.local.set({ passwords: saved });
-                    });
-                    // Store in Solana blockchain
-                    storeKeyValue(wallet, newPlabel, key).then(() => {
-                        console.log('Stored on Solana:', newPlabel);
-                    }).catch(err => {
-                        console.error('Solana storage error:', err);
                     });
                 } else {
                     console.error('Encryption error:', response?.error);
@@ -120,14 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const entry = (result.passwords || {})[label];
             if (!entry) return console.error('Label not found');
             // Retrieve key from Solana blockchain
-            getKeyValue(label).then(key => {
-                if (!key) {
-                    return console.error('Key not found on Solana for label:', label);
-                }
-            });
 
             chrome.runtime.sendMessage(
-                { type: 'wolfram-decrypt', input: entry.encrypted, key: key },
+                { type: 'wolfram-decrypt', input: entry.encrypted, key: entry.key },
                 response => {
                     if (response?.decrypted) {
                         listItem.innerHTML =
