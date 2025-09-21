@@ -48,8 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     } catch (e) {
                         // If it's not valid JSON, just use the original string
                     }
-                    re = re.replace(/\\+/g, '');      // Remove all backslashes
                     re = re.replace(/\\n|\\r|\\t/g, ''); // Remove escaped newlines, returns, tabs
+                    re = re.replace(/\\+/g, '');      // Remove all backslashes
                     re = re.replace(/\\\"/g, '"');    // Optionally, unescape quotes
 
                     console.log('Cleaned Encrypted:', re);
