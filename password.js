@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                          <button class="show-button">Show</button>
                          <button class="delete-button">Delete</button>
                        </li>`;
-                    console.log('Encrypted:', re);
+                    console.log('Encrypted:', JSON.stringify(re));
                     chrome.storage.local.get(['passwords'], result => {
                         const saved = result.passwords || {};
                         saved[newPlabel] = { encrypted: re, key };
