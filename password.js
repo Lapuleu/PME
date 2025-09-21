@@ -26,8 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const formData   = new FormData(myForm);
         const newPlabel  = formData.get("pLabel");
-        const newPassword= formData.get("password");
-        const key        = generateRandomKey(32);
+        let newPassword= formData.get("password");
+        let key        = generateRandomKey(32);
+        if (!newPlabel || !newPassword) return alert('Label and Password are required');
+
+        // Check for duplicate labels
+        if (savedPasswordsList.querySelector(`li[data-label="${newPlabel}"]`)) {
+            return alert('Label already exists. Please choose a different label.');
+        }
 
         // Encrypt using background service worker
         chrome.runtime.sendMessage(
@@ -65,6 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         );
         myForm.reset();
+        newPassword = null;
+        key = null;
     });
 
     // Delete or Hide password
